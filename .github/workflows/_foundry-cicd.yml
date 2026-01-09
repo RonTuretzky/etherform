@@ -1,5 +1,5 @@
 # All-in-one Foundry CI/CD reusable workflow (orchestrator)
-# Usage: jobs.<job>.uses: BreadchainCoop/etherform/.github/workflows/_foundry-cicd.yml@main
+# Usage: jobs.<job>.uses: RonTuretzky/etherform/.github/workflows/_foundry-cicd.yml@implement-cicd-spec
 #
 # This is the main entry point that orchestrates all sub-workflows.
 # For more granular control, you can import individual workflows:
@@ -127,7 +127,7 @@ jobs:
   # Change Detection
   # ─────────────────────────────────────────────────────────────────────────────
   detect-changes:
-    uses: BreadchainCoop/etherform/.github/workflows/_foundry-detect-changes.yml@main
+    uses: RonTuretzky/etherform/.github/workflows/_foundry-detect-changes.yml@implement-cicd-spec
     with:
       skip-if-no-changes: ${{ inputs.skip-if-no-changes }}
       contract-paths: ${{ inputs.contract-paths }}
@@ -139,7 +139,7 @@ jobs:
   ci:
     needs: [detect-changes]
     if: needs.detect-changes.outputs.should-run == 'true'
-    uses: BreadchainCoop/etherform/.github/workflows/_foundry-ci.yml@main
+    uses: RonTuretzky/etherform/.github/workflows/_foundry-ci.yml@implement-cicd-spec
     with:
       check-formatting: ${{ inputs.check-formatting }}
       test-verbosity: ${{ inputs.test-verbosity }}
@@ -153,7 +153,7 @@ jobs:
     if: |
       needs.detect-changes.outputs.should-run == 'true' &&
       inputs.run-upgrade-safety
-    uses: BreadchainCoop/etherform/.github/workflows/_foundry-upgrade-safety.yml@main
+    uses: RonTuretzky/etherform/.github/workflows/_foundry-upgrade-safety.yml@implement-cicd-spec
     with:
       baseline-path: ${{ inputs.baseline-path }}
       upgrades-path: ${{ inputs.upgrades-path }}
@@ -171,7 +171,7 @@ jobs:
       (needs.upgrade-safety.result == 'success' || needs.upgrade-safety.result == 'skipped') &&
       inputs.deploy-on-pr &&
       github.event_name == 'pull_request'
-    uses: BreadchainCoop/etherform/.github/workflows/_foundry-deploy.yml@main
+    uses: RonTuretzky/etherform/.github/workflows/_foundry-deploy.yml@implement-cicd-spec
     with:
       network-type: testnet
       deploy-script: ${{ inputs.deploy-script }}
@@ -199,7 +199,7 @@ jobs:
       inputs.deploy-on-main &&
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main'
-    uses: BreadchainCoop/etherform/.github/workflows/_foundry-deploy.yml@main
+    uses: RonTuretzky/etherform/.github/workflows/_foundry-deploy.yml@implement-cicd-spec
     with:
       network-type: mainnet
       deploy-script: ${{ inputs.deploy-script }}
@@ -226,7 +226,7 @@ jobs:
        (needs.deploy-mainnet.result == 'skipped' && inputs.init-baseline-without-deploy)) &&
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main'
-    uses: BreadchainCoop/etherform/.github/workflows/_foundry-post-mainnet.yml@main
+    uses: RonTuretzky/etherform/.github/workflows/_foundry-post-mainnet.yml@implement-cicd-spec
     with:
       flatten-contracts: ${{ inputs.flatten-contracts }}
       create-release: ${{ inputs.create-release && needs.deploy-mainnet.result == 'success' }}
